@@ -1,0 +1,1636 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>saltyfutureCraft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+/* Layout: schmale Werkzeugspalte links (Texturen, Bild, Material), rechts Ebenen-Raster und 3D-Vorschau. */
+:root {
+  --bg: #e4e8df;
+  --panel: #f6f8f3;
+  --panel-2: #dde3d6;
+  --line: #bcc5b3;
+  --fg: #1c2117;
+  --muted: #566050;
+  --accent: #3f8a24;
+  --accent-hi: #357420;
+  --accent-fg: #ffffff;
+  --ok: #2f7a17;
+  --warn: #8a5a00;
+  --err: #b3341f;
+  --field: #ffffff;
+  --code: #e3e8dc;
+  --band-a: #4a3722;
+  --band-b: #33271a;
+  --font-display: "Press Start 2P", ui-monospace, "Courier New", monospace;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17181b; --panel: #222328; --panel-2: #2d2e35; --line: #41434c; --fg: #ececf1; --muted: #a2a3b0;
+    --accent: #5fb23a; --accent-hi: #6ec746; --accent-fg: #0d1a07; --ok: #8fdc6b; --warn: #e0a83a; --err: #ee7a68;
+    --field: #17171c; --code: #14141a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #17181b; --panel: #222328; --panel-2: #2d2e35; --line: #41434c; --fg: #ececf1; --muted: #a2a3b0;
+  --accent: #5fb23a; --accent-hi: #6ec746; --accent-fg: #0d1a07; --ok: #8fdc6b; --warn: #e0a83a; --err: #ee7a68;
+  --field: #17171c; --code: #14141a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); line-height: 1.45; padding-inline: 0; }
+code, kbd { background: var(--code); padding: 1px 5px; border-radius: 4px; font-size: .9em; }
+kbd { border: 1px solid var(--line); }
+
+.top { padding: 18px 16px; background: linear-gradient(var(--band-a), var(--band-b)); border-bottom: 4px solid #6b4e2c; }
+.top-in { max-width: 1500px; margin: 0 auto; }
+.top h1 { margin: 0 0 8px; font: 16px/1.4 var(--font-display); color: #f4e8cf; text-shadow: 2px 2px 0 #00000066; overflow-wrap: anywhere; }
+.top p { margin: 0; color: #dccfb2; font-size: 14px; }
+
+.layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 16px; padding: 16px; max-width: 1500px; margin: 0 auto; }
+@media (max-width: 960px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+.side, .main { min-width: 0; }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+.card h2 { margin: 0 0 8px; font-size: 16px; }
+.card h3 { margin: 6px 0 8px; font-size: 14px; }
+.muted { color: var(--muted); }
+.small { font-size: 12.5px; }
+.row { display: flex; gap: 8px; align-items: center; margin: 10px 0; flex-wrap: wrap; }
+
+.btn { display: inline-block; cursor: pointer; text-align: center; background: var(--panel-2); color: var(--fg); border: 1px solid var(--line); padding: 9px 14px; border-radius: 7px; font: inherit; font-size: 14px; user-select: none; }
+.btn:hover:not(:disabled) { filter: brightness(.96); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn:focus-visible, input:focus-visible, select:focus-visible, .drop:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn.primary { display: block; width: 100%; background: var(--accent); border-color: var(--accent-hi); color: var(--accent-fg); font-weight: 700; margin-top: 12px; }
+.btn.ghost { display: block; width: 100%; margin-top: 8px; background: transparent; }
+.small-btn { padding: 6px 10px; font-size: 13px; white-space: nowrap; }
+
+input[type="text"], select { width: 100%; background: var(--field); color: var(--fg); border: 1px solid var(--line); border-radius: 7px; padding: 8px 10px; font: inherit; font-size: 14px; }
+.field { display: block; margin-top: 10px; font-size: 13px; color: var(--muted); }
+.field input, .field select { margin-top: 4px; }
+
+.status { margin: 10px 0 0; font-size: 13px; padding: 8px 10px; border-radius: 7px; background: var(--code); }
+.status.ok { color: var(--ok); }
+.status.warn { color: var(--warn); }
+.status.err { color: var(--err); }
+
+.drop { border: 2px dashed var(--line); border-radius: 10px; padding: 16px; text-align: center; margin-bottom: 10px; outline: none; }
+.drop p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+.drop.over { border-color: var(--accent); background: var(--code); }
+
+.preview { position: relative; margin-top: 10px; }
+.preview img { width: 100%; max-height: 220px; object-fit: contain; background: #111; border-radius: 8px; border: 1px solid var(--line); display: block; }
+.preview .x { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: #000a; color: #fff; font-size: 18px; cursor: pointer; }
+
+.empty { text-align: center; padding: 44px 16px; }
+
+.titlebar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.titlebar h2 { font-size: 18px; margin: 0; overflow-wrap: anywhere; }
+.nav { display: flex; align-items: center; gap: 10px; }
+.step { font: 11px var(--font-display); min-width: 150px; text-align: center; }
+#stepRange { width: 100%; margin-top: 10px; accent-color: var(--accent); }
+
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+@media (max-width: 1200px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+
+.canvasWrap { background: #111; border: 1px solid var(--line); border-radius: 8px; padding: 8px; overflow: auto; max-height: 640px; }
+#layerCanvas { image-rendering: pixelated; display: block; margin: 0 auto; max-width: none; }
+.hover { min-height: 20px; font-size: 13px; color: var(--ok); margin: 6px 0; }
+
+.threeWrap { background: #8fb7e8; border-radius: 8px; border: 1px solid var(--line); overflow: hidden; }
+#three { width: 100%; height: 480px; }
+#three canvas { display: block; cursor: grab; max-width: none; }
+.chk { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+
+.mat { list-style: none; margin: 0; padding: 0; max-height: 330px; overflow: auto; }
+.mat li { display: flex; align-items: center; gap: 10px; padding: 4px 2px; border-bottom: 1px solid var(--line); font-size: 13px; }
+.mat canvas { width: 28px; height: 28px; image-rendering: pixelated; flex: none; border-radius: 3px; }
+.mat .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mat .ct { text-align: right; color: var(--ok); font-variant-numeric: tabular-nums; }
+.mat .ct small { color: var(--muted); display: block; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<header class="top"><div class="top-in">
+  <h1>saltyfutureCraft</h1>
+  <p>Hausbild rein, Claude erkennt das Gebäude, du bekommst eine Schicht-für-Schicht-Anleitung mit Vanilla-Blöcken.</p>
+</div></header>
+
+<main class="layout">
+  <aside class="side">
+    <section class="card" id="texCard">
+      <h2>1 &middot; Vanilla-Texturen</h2>
+      <p class="muted small">Wähle einmalig deine Minecraft-Client-Datei (z.&nbsp;B. <code>1.21.x.jar</code>). Die Texturen werden nur in deinem Browser gelesen und gespeichert.</p>
+      <label class="btn" for="jarInput">Minecraft .jar wählen</label>
+      <input type="file" id="jarInput" accept=".jar,.zip" hidden>
+      <p id="texStatus" class="status warn">Keine Texturen geladen. Es werden Ersatzfarben gezeigt.</p>
+      <details class="small muted">
+        <summary>Wo finde ich die .jar?</summary>
+        <p>Windows: <code>%appdata%\.minecraft\versions\&lt;Version&gt;\&lt;Version&gt;.jar</code><br>
+        Mac: <code>~/Library/Application Support/minecraft/versions/…</code><br>
+        Linux: <code>~/.minecraft/versions/…</code></p>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>2 &middot; Haus-Bild</h2>
+      <div id="drop" class="drop" tabindex="0">
+        <p><strong>Bild hierher ziehen</strong>,<br>mit <kbd>Strg</kbd>+<kbd>V</kbd> einfügen<br>oder Datei wählen</p>
+        <label class="btn small-btn" for="imgInput">Datei wählen</label>
+        <input type="file" id="imgInput" accept="image/jpeg,image/png,image/webp" hidden>
+      </div>
+      <p class="muted small">Ohne Bild geht es auch: Beschreibe das Haus unten im Feld „Wunsch oder Beschreibung“.</p>
+      <p class="muted small">Bild aus dem Internet: Rechtsklick auf das Bild, „Bild kopieren“, dann hier <kbd>Strg</kbd>+<kbd>V</kbd>.</p>
+      <div id="preview" class="preview" hidden>
+        <img id="previewImg" alt="Vorschau des gewählten Hausbilds">
+        <button type="button" id="clearImg" class="x" title="Bild entfernen" aria-label="Bild entfernen">&times;</button>
+      </div>
+
+      <label class="field" for="sizeSel">Größe des Hauses
+        <select id="sizeSel">
+          <option value="S">Klein (bis 16×16×14)</option>
+          <option value="M" selected>Mittel (bis 24×24×20)</option>
+          <option value="L">Groß (bis 32×32×26)</option>
+          <option value="XL">Sehr groß (bis 44×44×34)</option>
+        </select>
+      </label>
+      <label class="field" for="qualSel">Genauigkeit
+        <select id="qualSel">
+          <option value="default" selected>Standard</option>
+          <option value="complex">Ausführlich (dauert länger)</option>
+        </select>
+      </label>
+      <label class="field" for="hintInput">Wunsch oder Beschreibung
+        <input type="text" id="hintInput" maxlength="300" placeholder="z. B. Dach aus Dark-Oak, mit Garten">
+      </label>
+
+      <button class="btn primary" id="analyzeBtn" type="button" disabled>Bauanleitung erstellen</button>
+      <button class="btn ghost" id="stopBtn" type="button" hidden>Abbrechen</button>
+      <button class="btn ghost" id="demoBtn" type="button">Demo-Haus laden</button>
+      <p id="analyzeStatus" class="status" hidden></p>
+    </section>
+
+    <section class="card" id="matCard" hidden>
+      <h2>Materialliste</h2>
+      <p class="muted small" id="matSummary"></p>
+      <ul id="matList" class="mat"></ul>
+      <div class="row">
+        <button class="btn small-btn" id="exportBtn" type="button">Bauplan speichern</button>
+        <label class="btn small-btn" for="importInput">Bauplan laden</label>
+        <input type="file" id="importInput" accept=".json" hidden>
+      </div>
+    </section>
+  </aside>
+
+  <section class="main">
+    <div id="empty" class="card empty">
+      <h2>Los geht's</h2>
+      <p>Wähle links deine Texturen und ein Haus-Bild, oder probiere zuerst das <strong>Demo-Haus</strong> aus.</p>
+    </div>
+
+    <div id="viewer" hidden>
+      <div class="card">
+        <div class="titlebar">
+          <div>
+            <h2 id="bpName">Haus</h2>
+            <p class="muted small" id="bpDims"></p>
+          </div>
+          <div class="nav">
+            <button class="btn small-btn" id="prevBtn" type="button" title="Ebene tiefer (←)">&larr;</button>
+            <span id="stepLabel" class="step">Ebene 1 / 1</span>
+            <button class="btn small-btn" id="nextBtn" type="button" title="Ebene höher (→)">&rarr;</button>
+          </div>
+        </div>
+        <input type="range" id="stepRange" min="0" max="0" value="0" aria-label="Ebene wählen">
+        <p class="muted small" id="bpNotes"></p>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <h3>Ebene <span id="yNum">1</span></h3>
+          <div class="canvasWrap"><canvas id="layerCanvas"></canvas></div>
+          <p class="muted small">Norden oben, Westen links. Blasse Blöcke gehören zur Ebene darunter. Ein weißer Pfeil auf einer Treppe zeigt, wo die hohe Stufe (Rückseite) liegt. Fahr mit der Maus über ein Feld.</p>
+          <p id="hover" class="hover">&nbsp;</p>
+          <h3>In dieser Ebene</h3>
+          <ul id="layerList" class="mat"></ul>
+        </div>
+
+        <div class="card">
+          <h3>3D-Vorschau</h3>
+          <div class="threeWrap"><div id="three"></div></div>
+          <div class="row">
+            <label class="chk"><input type="checkbox" id="onlyUpTo" checked> nur bis zur aktuellen Ebene</label>
+            <label class="chk"><input type="checkbox" id="autoRot"> drehen</label>
+          </div>
+          <p class="muted small">Ziehen = drehen &middot; Mausrad = zoomen &middot; Shift+Ziehen = verschieben</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* saltyfutureCraft – Web-Version
+ * - Texturen aus der eigenen Minecraft-.jar (nur lokal im Browser)
+ * - Bild -> /api/analyze -> Blaupause (Layer-Raster)
+ * - Ebenen-Ansicht (2D) + 3D-Vorschau (three.js)
+ */
+'use strict';
+
+const $ = (id) => document.getElementById(id);
+
+/* ======================================================================
+ * 1. Textur-Speicher (aus .jar)
+ * ==================================================================== */
+const tex = { raw: new Map(), count: 0 }; // name -> Canvas (erstes Frame)
+const texCache = new Map(); // name|tint -> Canvas
+const blockCache = new Map(); // block id -> Info
+const TEX_PATH = /^assets\/minecraft\/textures\/block\/([^/]+)\.png$/;
+
+function idb() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('mc-builder', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('kv');
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbGet(key) {
+  const db = await idb();
+  return new Promise((resolve, reject) => {
+    const r = db.transaction('kv').objectStore('kv').get(key);
+    r.onsuccess = () => resolve(r.result);
+    r.onerror = () => reject(r.error);
+  });
+}
+async function idbSet(key, val) {
+  const db = await idb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('kv', 'readwrite');
+    tx.objectStore('kv').put(val, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function decodeStore(store) {
+  tex.raw.clear();
+  texCache.clear();
+  blockCache.clear();
+  for (const [name, buf] of Object.entries(store)) {
+    try {
+      const bmp = await createImageBitmap(new Blob([buf], { type: 'image/png' }));
+      const c = document.createElement('canvas');
+      c.width = bmp.width;
+      c.height = Math.min(bmp.height, bmp.width); // animierte Texturen: erstes Frame
+      c.getContext('2d').drawImage(bmp, 0, 0);
+      tex.raw.set(name, c);
+    } catch (e) {
+      /* kaputte Datei überspringen */
+    }
+  }
+  tex.count = tex.raw.size;
+}
+
+async function loadJar(file) {
+  if (typeof JSZip === 'undefined') throw new Error('JSZip konnte nicht geladen werden (keine Internetverbindung oder Adblocker?).');
+  setTexStatus('Lese Texturen …', 'warn');
+  const zip = await JSZip.loadAsync(file);
+  const entries = [];
+  zip.forEach((p, f) => {
+    if (!f.dir && TEX_PATH.test(p)) entries.push([p, f]);
+  });
+  if (!entries.length) throw new Error('In dieser Datei wurden keine Block-Texturen gefunden. Nimm die Client-.jar einer Minecraft-Version (nicht die Server-.jar).');
+  const store = {};
+  for (const [p, f] of entries) store[TEX_PATH.exec(p)[1]] = await f.async('arraybuffer');
+  await decodeStore(store);
+  try { await idbSet('textures', store); } catch (e) { /* Speichern optional */ }
+  setTexStatus(`✓ ${tex.count} Vanilla-Texturen geladen`, 'ok');
+  onTexturesChanged();
+}
+
+function setTexStatus(msg, cls) {
+  const el = $('texStatus');
+  el.textContent = msg;
+  el.className = 'status ' + (cls || '');
+}
+
+function getTex(name, tint) {
+  const key = name + '|' + (tint || '');
+  if (texCache.has(key)) return texCache.get(key);
+  let src = tex.raw.get(name);
+  if (!src) return null;
+  if (tint) {
+    const c = document.createElement('canvas');
+    c.width = src.width;
+    c.height = src.height;
+    const g = c.getContext('2d');
+    g.drawImage(src, 0, 0);
+    g.globalCompositeOperation = 'multiply';
+    g.fillStyle = tint;
+    g.fillRect(0, 0, c.width, c.height);
+    g.globalCompositeOperation = 'destination-in';
+    g.drawImage(src, 0, 0);
+    src = c;
+  }
+  texCache.set(key, src);
+  return src;
+}
+
+function makeFallback(id) {
+  const key = 'fallback|' + id;
+  if (texCache.has(key)) return texCache.get(key);
+  let h = 0;
+  for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const c = document.createElement('canvas');
+  c.width = c.height = 16;
+  const g = c.getContext('2d');
+  g.fillStyle = `hsl(${h % 360} 45% 52%)`;
+  g.fillRect(0, 0, 16, 16);
+  g.fillStyle = `hsl(${h % 360} 45% 42%)`;
+  for (let y = 0; y < 16; y += 4) for (let x = 0; x < 16; x += 4) if (((x + y) / 4) % 2 === 0) g.fillRect(x, y, 4, 4);
+  texCache.set(key, c);
+  return c;
+}
+
+/* ======================================================================
+ * 2. Block-Auflösung (ID -> Texturen + Form)
+ * ==================================================================== */
+const TINT = { grass: '#91BD59', foliage: '#77AB2F', spruce: '#619961', birch: '#80A755', water: '#3F76E4' };
+
+function leafTint(id) {
+  if (/^(oak|jungle|acacia|dark_oak|mangrove)_leaves$/.test(id)) return TINT.foliage;
+  if (id === 'spruce_leaves') return TINT.spruce;
+  if (id === 'birch_leaves') return TINT.birch;
+  return null;
+}
+
+function hasAny(c) {
+  return tex.raw.has(c) || tex.raw.has(c + '_top') || tex.raw.has(c + '_side');
+}
+
+function findRoot(base) {
+  const specials = {
+    smooth_quartz: 'quartz_block_bottom',
+    smooth_sandstone: 'sandstone_top',
+    smooth_red_sandstone: 'red_sandstone_top',
+    petrified_oak: 'oak_planks',
+    quartz: 'quartz_block',
+    water: 'water_still',
+    lava: 'lava_still',
+  };
+  const cands = [base];
+  if (specials[base]) cands.push(specials[base]);
+  cands.push(base + '_planks', base + 's', base + '_block', base.replace(/_brick$/, '_bricks'), base.replace(/_tile$/, '_tiles'));
+  for (const c of cands) if (hasAny(c)) return c;
+  return null;
+}
+
+function computeBlock(fullId) {
+  const pm = /^([^\[]+)(?:\[(.*)\])?$/.exec(fullId) || [fullId, fullId, ''];
+  const id = pm[1];
+  const fm = /facing=(north|south|east|west)/.exec(pm[2] || '');
+  let kind = 'cube';
+  let base = id;
+  let doorTex = false;
+
+  if (/_slab$/.test(id)) { kind = 'slab'; base = id.slice(0, -5); }
+  else if (/_stairs$/.test(id)) { kind = 'stair'; base = id.slice(0, -7); }
+  else if (/_fence_gate$/.test(id)) { kind = 'fence'; base = id.slice(0, -11); }
+  else if (/_fence$/.test(id)) { kind = 'fence'; base = id.slice(0, -6); }
+  else if (/_wall$/.test(id)) { kind = 'wall'; base = id.slice(0, -5); }
+  else if (/_pane$/.test(id)) { kind = 'pane'; base = id.slice(0, -5); }
+  else if (/_door$/.test(id)) { kind = 'door'; doorTex = true; }
+  else if (/_trapdoor$/.test(id)) { kind = 'trapdoor'; }
+  else if (/_carpet$/.test(id) && id !== 'moss_carpet') { kind = 'carpet'; base = id.replace(/_carpet$/, '_wool'); }
+  else if (/_pressure_plate$/.test(id)) { kind = 'carpet'; base = id.replace(/_pressure_plate$/, ''); }
+  else if (/_button$/.test(id)) { kind = 'small'; base = id.replace(/_button$/, ''); }
+  else if (/^(soul_)?(wall_)?torch$/.test(id)) { kind = 'cross'; base = id.replace('wall_', ''); }
+  else if (/^(soul_)?lantern$|^candle$/.test(id)) { kind = 'small'; }
+
+  const occludes = kind === 'cube' && !/glass|leaves|^water$|ice$|iron_bars|ladder|vine|spawner|cobweb/.test(id);
+  const cutout = /glass|leaves|iron_bars|ladder|vine|door|torch|lantern|candle|pane|fence|cobweb/.test(id);
+  const opacity = id === 'water' ? 0.75 : 1;
+  const info = { id, kind, occludes, cutout, opacity, facing: fm ? fm[1] : null };
+
+  let top, side, bottom;
+
+  if (doorTex) {
+    top = getTex(id + '_top');
+    side = getTex(id + '_bottom') || top;
+    bottom = side;
+  } else if (id === 'grass_block') {
+    top = getTex('grass_block_top', TINT.grass);
+    const s = getTex('grass_block_side');
+    const ov = getTex('grass_block_side_overlay', TINT.grass);
+    if (s) {
+      const c = document.createElement('canvas');
+      c.width = s.width; c.height = s.height;
+      const g = c.getContext('2d');
+      g.drawImage(s, 0, 0);
+      if (ov) g.drawImage(ov, 0, 0);
+      side = c;
+    }
+    bottom = getTex('dirt');
+  } else {
+    const root = findRoot(base);
+    if (root) {
+      const T = (n) => (tex.raw.has(n) ? n : null);
+      const sideN = T(root + '_side') || T(root) || T(root + '_top');
+      let topN = T(root + '_top') || T(root) || sideN;
+      let botN = T(root + '_bottom') || T(root + '_top') || T(root) || sideN;
+      if (root === 'bookshelf') topN = botN = 'oak_planks';
+      if (['podzol', 'mycelium', 'dirt_path'].includes(root)) botN = 'dirt';
+      const tint = id === 'water' ? TINT.water : leafTint(id);
+      top = getTex(topN, tint);
+      side = getTex(sideN, tint);
+      bottom = getTex(botN, tint);
+    }
+  }
+  top = top || side || bottom || makeFallback(id);
+  side = side || top;
+  bottom = bottom || top;
+  info.top = top;
+  info.side = side;
+  info.bottom = bottom;
+  return info;
+}
+
+function resolveBlock(id) {
+  let info = blockCache.get(id);
+  if (!info) {
+    info = computeBlock(id);
+    blockCache.set(id, info);
+  }
+  return info;
+}
+
+function baseOf(id) {
+  return String(id).replace(/\[.*$/, '');
+}
+
+const DIR_DE = { north: 'Norden', south: 'Süden', east: 'Osten', west: 'Westen' };
+function describe(id) {
+  const m = /facing=(\w+)/.exec(id);
+  return prettyName(id) + (m && DIR_DE[m[1]] ? ` (hohe Seite nach ${DIR_DE[m[1]]})` : '');
+}
+
+function prettyName(id) {
+  return baseOf(id).split('_').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+/* ======================================================================
+ * 3. Blaupause
+ * ==================================================================== */
+const state = {
+  bp: null, // { name, notes, width, depth, height, palette, layers }
+  step: 0,
+  cs: 28, // Zellengröße in px (2D)
+};
+const M = 22; // Rand für Achsenbeschriftung
+
+function getId(bp, y, z, x) {
+  const ch = bp.layers[y]?.[z]?.[x];
+  return ch && ch !== '.' ? bp.palette[ch] || null : null;
+}
+
+function normalizeBp(bp) {
+  if (!bp || typeof bp.palette !== 'object' || !Array.isArray(bp.layers) || !bp.layers.length) throw new Error('Ungültige Blaupause');
+  const depth = Math.max(...bp.layers.map((l) => l.length));
+  const width = Math.max(...bp.layers.flatMap((l) => l.map((r) => r.length)));
+  const layers = bp.layers.map((l) => {
+    const rows = [];
+    for (let z = 0; z < depth; z++) rows.push((l[z] || '').padEnd(width, '.'));
+    return rows;
+  });
+  return { name: bp.name || 'Haus', notes: bp.notes || '', palette: bp.palette, layers, width, depth, height: layers.length };
+}
+
+function setBlueprint(raw) {
+  const bp = normalizeBp(raw);
+  state.bp = bp;
+  state.step = 0;
+  $('empty').hidden = true;
+  $('viewer').hidden = false;
+  $('matCard').hidden = false;
+  $('bpName').textContent = bp.name;
+  $('bpDims').textContent = `${bp.width} × ${bp.depth} Blöcke Grundfläche · ${bp.height} Ebenen hoch`;
+  $('bpNotes').textContent = bp.notes;
+  $('bpNotes').hidden = !bp.notes;
+  $('stepRange').max = String(bp.height - 1);
+  state.cs = Math.max(14, Math.min(40, Math.floor(640 / Math.max(bp.width, bp.depth))));
+  renderMaterials();
+  safeRebuild3D();
+  setStep(0);
+}
+
+function safeRebuild3D() {
+  try {
+    rebuild3D();
+  } catch (e) {
+    console.error(e);
+    $('three').innerHTML = '<p style="padding:16px;color:#222">3D-Vorschau nicht verfügbar: ' + (e.message || e) + '</p>';
+  }
+}
+
+function setStep(n) {
+  const bp = state.bp;
+  if (!bp) return;
+  state.step = Math.max(0, Math.min(bp.height - 1, n));
+  $('stepRange').value = String(state.step);
+  $('stepLabel').textContent = `Ebene ${state.step + 1} / ${bp.height}`;
+  $('yNum').textContent = String(state.step + 1);
+  $('prevBtn').disabled = state.step === 0;
+  $('nextBtn').disabled = state.step === bp.height - 1;
+  drawLayer();
+  renderLayerList();
+  updateVisibility();
+}
+
+/* ---------- 2D-Ebenenansicht ---------- */
+function iconCanvas(id) {
+  const info = resolveBlock(id);
+  const c = document.createElement('canvas');
+  c.width = c.height = 28;
+  const g = c.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  g.drawImage(info.kind === 'cube' || info.kind === 'slab' || info.kind === 'stair' ? info.side : info.top, 0, 0, 28, 28);
+  return c;
+}
+
+function drawArrow(g, px, py, cs, dir) {
+  const [dx, dy] = { north: [0, -1], south: [0, 1], east: [1, 0], west: [-1, 0] }[dir];
+  const cx = px + cs / 2;
+  const cy = py + cs / 2;
+  const r = cs * 0.28;
+  const qx = -dy;
+  const qy = dx;
+  g.save();
+  g.fillStyle = 'rgba(255,255,255,.92)';
+  g.strokeStyle = 'rgba(0,0,0,.8)';
+  g.lineWidth = 1.5;
+  g.beginPath();
+  g.moveTo(cx + dx * r, cy + dy * r);
+  g.lineTo(cx - dx * r + qx * r * 0.8, cy - dy * r + qy * r * 0.8);
+  g.lineTo(cx - dx * r - qx * r * 0.8, cy - dy * r - qy * r * 0.8);
+  g.closePath();
+  g.fill();
+  g.stroke();
+  g.restore();
+}
+
+function drawLayer() {
+  const bp = state.bp;
+  if (!bp) return;
+  const cv = $('layerCanvas');
+  const cs = state.cs;
+  cv.width = M + bp.width * cs;
+  cv.height = M + bp.depth * cs;
+  const g = cv.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  g.fillStyle = '#16161b';
+  g.fillRect(0, 0, cv.width, cv.height);
+
+  const y = state.step;
+  const drawCells = (yy, onlyIfAirAbove) => {
+    for (let z = 0; z < bp.depth; z++) {
+      for (let x = 0; x < bp.width; x++) {
+        const id = getId(bp, yy, z, x);
+        if (!id) continue;
+        if (onlyIfAirAbove && getId(bp, y, z, x)) continue;
+        const info = resolveBlock(id);
+        g.drawImage(info.top, M + x * cs, M + z * cs, cs, cs);
+        if (!onlyIfAirAbove && info.facing && info.kind === 'stair') drawArrow(g, M + x * cs, M + z * cs, cs, info.facing);
+      }
+    }
+  };
+  if (y > 0) {
+    g.globalAlpha = 0.28;
+    drawCells(y - 1, true);
+    g.globalAlpha = 1;
+  }
+  drawCells(y, false);
+
+  // Gitter
+  g.lineWidth = 1;
+  for (let i = 0; i <= bp.width; i++) {
+    g.strokeStyle = i % 5 === 0 ? 'rgba(255,255,255,.28)' : 'rgba(255,255,255,.1)';
+    g.beginPath(); g.moveTo(M + i * cs + 0.5, M); g.lineTo(M + i * cs + 0.5, M + bp.depth * cs); g.stroke();
+  }
+  for (let i = 0; i <= bp.depth; i++) {
+    g.strokeStyle = i % 5 === 0 ? 'rgba(255,255,255,.28)' : 'rgba(255,255,255,.1)';
+    g.beginPath(); g.moveTo(M, M + i * cs + 0.5); g.lineTo(M + bp.width * cs, M + i * cs + 0.5); g.stroke();
+  }
+  // Achsenzahlen
+  g.fillStyle = '#a8a8b8';
+  g.font = '11px system-ui, sans-serif';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  const every = cs >= 22 ? 1 : 5;
+  for (let x = 0; x < bp.width; x++) if ((x + 1) % every === 0 || x === 0) g.fillText(String(x + 1), M + x * cs + cs / 2, M / 2);
+  for (let z = 0; z < bp.depth; z++) if ((z + 1) % every === 0 || z === 0) g.fillText(String(z + 1), M / 2, M + z * cs + cs / 2);
+}
+
+function renderLayerList() {
+  const bp = state.bp;
+  const counts = new Map();
+  for (let z = 0; z < bp.depth; z++) for (let x = 0; x < bp.width; x++) {
+    const id = getId(bp, state.step, z, x);
+    if (id) counts.set(baseOf(id), (counts.get(baseOf(id)) || 0) + 1);
+  }
+  const ul = $('layerList');
+  ul.innerHTML = '';
+  if (!counts.size) {
+    ul.innerHTML = '<li class="muted">Diese Ebene ist leer.</li>';
+    return;
+  }
+  [...counts.entries()].sort((a, b) => b[1] - a[1]).forEach(([id, n]) => ul.appendChild(listItem(id, n)));
+}
+
+function stackText(n) {
+  const s = Math.floor(n / 64);
+  const r = n % 64;
+  const parts = [];
+  if (s) parts.push(`${s}×64`);
+  if (r) parts.push(String(r));
+  return parts.join(' + ');
+}
+
+function listItem(id, n) {
+  const li = document.createElement('li');
+  li.appendChild(iconCanvas(id));
+  const nm = document.createElement('span');
+  nm.className = 'nm';
+  nm.textContent = prettyName(id);
+  nm.title = 'minecraft:' + id;
+  const ct = document.createElement('span');
+  ct.className = 'ct';
+  ct.innerHTML = `${n}` + (n > 64 ? `<small>${stackText(n)}</small>` : '');
+  li.append(nm, ct);
+  return li;
+}
+
+function renderMaterials() {
+  const bp = state.bp;
+  const counts = new Map();
+  let total = 0;
+  for (let y = 0; y < bp.height; y++) for (let z = 0; z < bp.depth; z++) for (let x = 0; x < bp.width; x++) {
+    const id = getId(bp, y, z, x);
+    if (id) { counts.set(baseOf(id), (counts.get(baseOf(id)) || 0) + 1); total++; }
+  }
+  $('matSummary').textContent = `${total} Blöcke · ${counts.size} verschiedene Blocktypen`;
+  const ul = $('matList');
+  ul.innerHTML = '';
+  [...counts.entries()].sort((a, b) => b[1] - a[1]).forEach(([id, n]) => ul.appendChild(listItem(id, n)));
+}
+
+$('layerCanvas').addEventListener('mousemove', (e) => {
+  const bp = state.bp;
+  if (!bp) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  const scale = e.currentTarget.width / r.width;
+  const px = (e.clientX - r.left) * scale;
+  const py = (e.clientY - r.top) * scale;
+  const x = Math.floor((px - M) / state.cs);
+  const z = Math.floor((py - M) / state.cs);
+  if (x < 0 || z < 0 || x >= bp.width || z >= bp.depth) { $('hover').innerHTML = '&nbsp;'; return; }
+  const id = getId(bp, state.step, z, x);
+  $('hover').textContent = `Spalte ${x + 1}, Reihe ${z + 1} · ${id ? describe(id) : 'Luft'}`;
+});
+$('layerCanvas').addEventListener('mouseleave', () => { $('hover').innerHTML = '&nbsp;'; });
+
+$('prevBtn').addEventListener('click', () => setStep(state.step - 1));
+$('nextBtn').addEventListener('click', () => setStep(state.step + 1));
+$('stepRange').addEventListener('input', (e) => setStep(parseInt(e.target.value, 10)));
+document.addEventListener('keydown', (e) => {
+  if (!state.bp || /input|select|textarea/i.test(document.activeElement?.tagName || '')) return;
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') setStep(state.step - 1);
+  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') setStep(state.step + 1);
+});
+
+/* ======================================================================
+ * 4. 3D-Vorschau (three.js)
+ * ==================================================================== */
+const view = {
+  renderer: null, scene: null, camera: null, root: null, groups: [],
+  target: null, theta: 0.65, phi: 1.05, dist: 30, auto: false, raf: 0,
+};
+const geoCache = new Map();
+const matCache = new Map();
+const canvasIds = new WeakMap();
+let canvasSeq = 0;
+
+function box(w, h, d) {
+  const k = `${w}|${h}|${d}`;
+  if (!geoCache.has(k)) geoCache.set(k, new THREE.BoxGeometry(w, h, d));
+  return geoCache.get(k);
+}
+
+function matFor(canvas, info) {
+  if (!canvasIds.has(canvas)) canvasIds.set(canvas, ++canvasSeq);
+  const k = `${canvasIds.get(canvas)}|${info.cutout}|${info.opacity}|${info.kind === 'cross'}`;
+  let m = matCache.get(k);
+  if (!m) {
+    const t = new THREE.CanvasTexture(canvas);
+    t.magFilter = THREE.NearestFilter;
+    t.minFilter = THREE.NearestFilter;
+    t.generateMipmaps = false;
+    t.encoding = THREE.sRGBEncoding;
+    m = new THREE.MeshLambertMaterial({
+      map: t,
+      transparent: info.cutout || info.opacity < 1,
+      alphaTest: info.cutout ? 0.15 : 0,
+      opacity: info.opacity,
+      side: info.cutout ? THREE.DoubleSide : THREE.FrontSide,
+    });
+    matCache.set(k, m);
+  }
+  return m;
+}
+
+function facesFor(info) {
+  const s = matFor(info.side, info);
+  const t = matFor(info.top, info);
+  const b = matFor(info.bottom, info);
+  return [s, s, t, b, s, s]; // +x, -x, +y, -y, +z, -z
+}
+
+function ensureThree() {
+  if (view.renderer) return;
+  if (typeof THREE === 'undefined') throw new Error('three.js konnte nicht geladen werden (keine Internetverbindung oder Adblocker?). Die Ebenen-Ansicht funktioniert trotzdem.');
+  const host = $('three');
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  host.appendChild(renderer.domElement);
+  view.renderer = renderer;
+
+  view.scene = new THREE.Scene();
+  view.scene.background = new THREE.Color(0x8fb7e8);
+  view.scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.55);
+  sun.position.set(-0.5, 1, 0.8);
+  view.scene.add(sun);
+
+  view.camera = new THREE.PerspectiveCamera(50, 1, 0.1, 500);
+  view.target = new THREE.Vector3();
+  view.root = new THREE.Group();
+  view.scene.add(view.root);
+
+  const resize = () => {
+    const w = host.clientWidth || 400;
+    const h = host.clientHeight || 480;
+    renderer.setSize(w, h);
+    view.camera.aspect = w / h;
+    view.camera.updateProjectionMatrix();
+  };
+  new ResizeObserver(resize).observe(host);
+  resize();
+
+  // Steuerung
+  const el = renderer.domElement;
+  let drag = null;
+  el.addEventListener('contextmenu', (e) => e.preventDefault());
+  el.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY }; el.setPointerCapture(e.pointerId); el.style.cursor = 'grabbing'; });
+  el.addEventListener('pointerup', () => { drag = null; el.style.cursor = 'grab'; });
+  el.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x;
+    const dy = e.clientY - drag.y;
+    drag = { x: e.clientX, y: e.clientY };
+    if (e.shiftKey || (e.buttons & 2)) {
+      const k = view.dist * 0.0018;
+      const right = new THREE.Vector3().setFromMatrixColumn(view.camera.matrix, 0);
+      const up = new THREE.Vector3().setFromMatrixColumn(view.camera.matrix, 1);
+      view.target.addScaledVector(right, -dx * k).addScaledVector(up, dy * k);
+    } else {
+      view.theta -= dx * 0.008;
+      view.phi = Math.max(0.15, Math.min(Math.PI - 0.15, view.phi - dy * 0.008));
+    }
+  });
+  el.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    view.dist = Math.max(4, Math.min(220, view.dist * (e.deltaY > 0 ? 1.1 : 0.9)));
+  }, { passive: false });
+
+  const loop = () => {
+    view.raf = requestAnimationFrame(loop);
+    if (view.auto) view.theta += 0.004;
+    const sp = Math.sin(view.phi);
+    view.camera.position.set(
+      view.target.x + view.dist * sp * Math.sin(view.theta),
+      view.target.y + view.dist * Math.cos(view.phi),
+      view.target.z + view.dist * sp * Math.cos(view.theta)
+    );
+    view.camera.lookAt(view.target);
+    renderer.render(view.scene, view.camera);
+  };
+  loop();
+}
+
+function rebuild3D() {
+  const bp = state.bp;
+  if (!bp) return;
+  ensureThree();
+  // alte Gruppen entfernen
+  view.groups.forEach((g) => view.root.remove(g));
+  view.groups = [];
+  matCache.clear(); // Materialien nach Textur-Wechsel neu aufbauen
+
+  const solid = (x, y, z) => !!getId(bp, y, z, x);
+  const occ = (x, y, z) => {
+    if (x < 0 || y < 0 || z < 0 || x >= bp.width || y >= bp.height || z >= bp.depth) return false;
+    const id = getId(bp, y, z, x);
+    return id ? resolveBlock(id).occludes : false;
+  };
+
+  for (let y = 0; y < bp.height; y++) {
+    const group = new THREE.Group();
+    for (let z = 0; z < bp.depth; z++) {
+      for (let x = 0; x < bp.width; x++) {
+        const id = getId(bp, y, z, x);
+        if (!id) continue;
+        const info = resolveBlock(id);
+        if (info.occludes && occ(x - 1, y, z) && occ(x + 1, y, z) && occ(x, y - 1, z) && occ(x, y + 1, z) && occ(x, y, z - 1) && occ(x, y, z + 1)) continue;
+        addBlock(group, x, y, z, info, solid);
+      }
+    }
+    view.root.add(group);
+    view.groups.push(group);
+  }
+
+  view.target.set(bp.width / 2, bp.height / 2.4, bp.depth / 2);
+  view.dist = Math.max(bp.width, bp.depth, bp.height) * 1.7 + 6;
+  updateVisibility();
+}
+
+function addBlock(group, x, y, z, info, solid) {
+  const mats = facesFor(info);
+  const put = (geo, px, py, pz, m = mats) => {
+    const mesh = new THREE.Mesh(geo, m);
+    mesh.position.set(px, py, pz);
+    group.add(mesh);
+    return mesh;
+  };
+  const cx = x + 0.5;
+  const cz = z + 0.5;
+  // Läuft die Wand entlang x? (Nachbarn links/rechts vorhanden)
+  const alongX = () => solid(x - 1, y, z) || solid(x + 1, y, z);
+  switch (info.kind) {
+    case 'slab':
+      put(box(1, 0.5, 1), cx, y + 0.25, cz);
+      break;
+    case 'stair': {
+      put(box(1, 0.5, 1), cx, y + 0.25, cz);
+      const f = info.facing || 'south';
+      if (f === 'south') put(box(1, 0.5, 0.5), cx, y + 0.75, z + 0.75);
+      else if (f === 'north') put(box(1, 0.5, 0.5), cx, y + 0.75, z + 0.25);
+      else if (f === 'east') put(box(0.5, 0.5, 1), x + 0.75, y + 0.75, cz);
+      else put(box(0.5, 0.5, 1), x + 0.25, y + 0.75, cz);
+      break;
+    }
+    case 'carpet':
+      put(box(1, 0.0625, 1), cx, y + 0.03, cz);
+      break;
+    case 'trapdoor':
+      put(box(1, 0.1875, 1), cx, y + 0.1, cz);
+      break;
+    case 'pane':
+    case 'door': {
+      const t = info.kind === 'door' ? 0.19 : 0.125;
+      put(alongX() ? box(1, 1, t) : box(t, 1, 1), cx, y + 0.5, cz);
+      break;
+    }
+    case 'fence':
+      put(box(0.25, 1, 0.25), cx, y + 0.5, cz);
+      break;
+    case 'wall':
+      put(box(0.5, 1, 0.5), cx, y + 0.5, cz);
+      break;
+    case 'small':
+      put(box(0.375, 0.5, 0.375), cx, y + 0.25, cz);
+      break;
+    case 'cross': {
+      const plane = new THREE.PlaneGeometry(1, 1);
+      const m = matFor(info.top, info);
+      [Math.PI / 4, -Math.PI / 4].forEach((r) => {
+        const mesh = new THREE.Mesh(plane, m);
+        mesh.position.set(cx, y + 0.5, cz);
+        mesh.rotation.y = r;
+        group.add(mesh);
+      });
+      break;
+    }
+    default:
+      put(box(1, 1, 1), cx, y + 0.5, cz);
+  }
+}
+
+function updateVisibility() {
+  if (!view.groups.length) return;
+  const only = $('onlyUpTo').checked;
+  view.groups.forEach((g, i) => { g.visible = only ? i <= state.step : true; });
+}
+$('onlyUpTo').addEventListener('change', updateVisibility);
+$('autoRot').addEventListener('change', (e) => { view.auto = e.target.checked; });
+
+function onTexturesChanged() {
+  blockCache.clear();
+  if (state.bp) {
+    renderMaterials();
+    safeRebuild3D();
+    setStep(state.step);
+  }
+}
+
+/* ======================================================================
+ * 5. Bild-Eingabe und KI-Analyse (über Claude, direkt in der Seite)
+ * ==================================================================== */
+let canText = false;
+let canImages = false;
+let ctl = null;
+state.image = null;
+state.previewUrl = null;
+
+function setAnalyzeStatus(msg, cls) {
+  const el = $('analyzeStatus');
+  el.hidden = !msg;
+  el.textContent = msg;
+  el.className = 'status ' + (cls || '');
+}
+
+function refreshAnalyzeBtn() {
+  const hasHint = $('hintInput').value.trim().length > 2;
+  $('analyzeBtn').disabled = !(canText && (state.image ? canImages : hasHint));
+  $('analyzeBtn').textContent = state.image ? 'Bauanleitung aus Bild erstellen' : 'Bauanleitung aus Beschreibung erstellen';
+}
+
+function clearImage() {
+  if (state.previewUrl) { try { URL.revokeObjectURL(state.previewUrl); } catch (e) { /* egal */ } }
+  state.image = null;
+  state.previewUrl = null;
+  $('preview').hidden = true;
+  $('previewImg').removeAttribute('src');
+  refreshAnalyzeBtn();
+}
+
+function loadImageFile(file) {
+  if (!file || !/^image\/(jpeg|png|webp)$/.test(file.type)) {
+    return setAnalyzeStatus('Bitte ein Bild wählen (JPG, PNG oder WebP).', 'err');
+  }
+  if (state.previewUrl) { try { URL.revokeObjectURL(state.previewUrl); } catch (e) { /* egal */ } }
+  state.image = file;
+  state.previewUrl = URL.createObjectURL(file);
+  $('previewImg').src = state.previewUrl;
+  $('preview').hidden = false;
+  setAnalyzeStatus(canImages || !canText ? '' : 'In dieser Ansicht kann kein Bild an Claude geschickt werden. Beschreibe das Haus stattdessen im Wunsch-Feld.', canImages || !canText ? '' : 'warn');
+  refreshAnalyzeBtn();
+}
+
+$('jarInput').addEventListener('change', async (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  try { await loadJar(f); } catch (err) { setTexStatus('✗ ' + err.message, 'err'); }
+  e.target.value = '';
+});
+$('imgInput').addEventListener('change', (e) => { loadImageFile(e.target.files[0]); e.target.value = ''; });
+$('clearImg').addEventListener('click', clearImage);
+$('hintInput').addEventListener('input', refreshAnalyzeBtn);
+
+const drop = $('drop');
+['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', (e) => {
+  const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if (f) loadImageFile(f);
+  else setAnalyzeStatus('Zieh das Bild bitte als Datei hierher, oder kopiere es und drück Strg+V.', 'warn');
+});
+
+document.addEventListener('paste', (e) => {
+  const cd = e.clipboardData;
+  if (!cd) return;
+  const file = [...cd.files].find((f) => f.type.startsWith('image/'));
+  if (file) { e.preventDefault(); loadImageFile(file); }
+});
+
+/* ======================================================================
+ * Haus-Generator: Beschreibung (JSON von Claude) -> Block-Ebenen
+ * ==================================================================== */
+// GEN_START
+const GEN = (() => {
+  const DIRS = { north: [0, -1], south: [0, 1], west: [-1, 0], east: [1, 0] };
+  const OPP = { north: 'south', south: 'north', west: 'east', east: 'west' };
+  const WOODS = ['oak', 'spruce', 'birch', 'jungle', 'acacia', 'dark_oak', 'mangrove', 'cherry', 'bamboo', 'crimson', 'warped', 'pale_oak'];
+  const IRREG = {
+    stone_brick: 'stone_bricks', brick: 'bricks', nether_brick: 'nether_bricks', red_nether_brick: 'red_nether_bricks',
+    deepslate_tile: 'deepslate_tiles', deepslate_brick: 'deepslate_bricks', mud_brick: 'mud_bricks',
+    mossy_stone_brick: 'mossy_stone_bricks', prismarine_brick: 'prismarine_bricks', end_stone_brick: 'end_stone_bricks',
+    polished_blackstone_brick: 'polished_blackstone_bricks', tuff_brick: 'tuff_bricks', quartz: 'quartz_block',
+  };
+  const SYMS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+  const num = (v, def, lo, hi) => {
+    v = Math.round(Number(v));
+    if (!Number.isFinite(v)) v = def;
+    return Math.max(lo, Math.min(hi, v));
+  };
+  const frac = (v, def) => {
+    v = Number(v);
+    return Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : def;
+  };
+  const idOf = (v, def) => {
+    const s = String(v == null || v === '' ? def : v).toLowerCase().replace(/^minecraft:/, '').replace(/\[.*$/, '').trim().replace(/\s+/g, '_');
+    return s || def;
+  };
+
+  function roofSet(name) {
+    const b = idOf(name, 'dark_oak').replace(/_(stairs|slab|planks|block)$/, '');
+    return { stairs: b + '_stairs', slab: b + '_slab', block: WOODS.includes(b) ? b + '_planks' : (IRREG[b] || b) };
+  }
+  const doorId = (name) => {
+    const d = idOf(name, 'oak');
+    return /_door$/.test(d) ? d : d + '_door';
+  };
+
+  function generate(spec, lim) {
+    if (!spec || !Array.isArray(spec.parts) || !spec.parts.length) throw new Error('Die Antwort enthielt keinen Hausplan.');
+    lim = lim || { w: 24, d: 24, h: 20 };
+    const mat = Object.assign({
+      wall: 'oak_planks', corner: 'oak_log', base: 'cobblestone', floor: 'oak_planks',
+      roof: 'dark_oak', window: 'glass_pane', door: 'oak', ground: 'grass_block', path: 'dirt_path',
+    }, spec.materials || {});
+
+    const cells = new Map();
+    const K = (x, y, z) => x + ',' + y + ',' + z;
+    const put = (x, y, z, id) => { cells.set(K(x, y, z), id); };
+    const has = (x, y, z) => cells.has(K(x, y, z));
+    const outDoors = [];
+    const maxW = Math.max(5, lim.w - 2);
+    const maxD = Math.max(5, lim.d - 2);
+
+    spec.parts.slice(0, 6).forEach((p) => {
+      if (!p || typeof p !== 'object') return;
+      const m = Object.assign({}, mat, p.materials || {});
+      const wall = idOf(m.wall, 'oak_planks');
+      const corner = idOf(m.corner, 'oak_log');
+      const base = idOf(m.base, 'cobblestone');
+      const floorB = idOf(m.floor, 'oak_planks');
+      const band = idOf(m.band, wall);
+      const win = idOf(m.window, 'glass_pane');
+      const door = doorId(m.door);
+
+      const x0 = num(p.x, 0, -20, 60);
+      const z0 = num(p.z, 0, -20, 60);
+      const w = num(p.w, 9, 3, maxW);
+      const d = num(p.d, 7, 3, maxD);
+      const h = num(p.floor_height, 3, 2, 6);
+      let n = num(p.floors, 1, 1, 4);
+      while (n > 1 && n * (h + 1) > lim.h - 5) n--;
+      const yc = n * (h + 1);
+      const bh = num(p.base_height, 1, 0, 3);
+      const x1 = x0 + w - 1;
+      const z1 = z0 + d - 1;
+
+      // Bereich freiräumen (spätere Teile dominieren frühere)
+      for (let x = x0; x <= x1; x++) for (let z = z0; z <= z1; z++) for (let y = 0; y <= lim.h + 14; y++) cells.delete(K(x, y, z));
+
+      // Fundament / Boden
+      for (let x = x0; x <= x1; x++) for (let z = z0; z <= z1; z++) {
+        const edge = x === x0 || x === x1 || z === z0 || z === z1;
+        put(x, 0, z, edge ? base : floorB);
+      }
+      // Zwischendecken und Decke
+      for (let k = 1; k <= n; k++) {
+        for (let x = x0 + 1; x < x1; x++) for (let z = z0 + 1; z < z1; z++) put(x, k * (h + 1), z, floorB);
+      }
+      // Wände
+      for (let y = 1; y <= yc; y++) {
+        for (let x = x0; x <= x1; x++) for (let z = z0; z <= z1; z++) {
+          const onX = x === x0 || x === x1;
+          const onZ = z === z0 || z === z1;
+          if (!onX && !onZ) continue;
+          let id;
+          if (onX && onZ) id = corner;
+          else if (y <= bh) id = base;
+          else if (y === yc || y % (h + 1) === 0) id = band;
+          else id = wall;
+          put(x, y, z, id);
+        }
+      }
+
+      // Zugang zu Wandzelle: side + Index entlang der Wand (0 = West/Nord)
+      const cellOf = (side, i) => {
+        const alongX = side === 'north' || side === 'south';
+        return alongX
+          ? [x0 + i, side === 'north' ? z0 : z1]
+          : [side === 'west' ? x0 : x1, z0 + i];
+      };
+      const lenOf = (side) => (side === 'north' || side === 'south' ? w : d);
+
+      // Türen
+      const doorCols = [];
+      let ds = p.doors === false ? [] : (Array.isArray(p.doors) ? p.doors : [{ side: 'south', pos: 0.5 }]);
+      ds = ds.filter((q) => q && typeof q === 'object').slice(0, 4);
+      ds.forEach((q) => {
+        const side = DIRS[q.side] ? q.side : 'south';
+        const dw = num(q.width, 1, 1, 2);
+        const L = lenOf(side);
+        let i = Math.round(1 + frac(q.pos, 0.5) * (L - 2 - dw));
+        i = Math.max(1, Math.min(L - 1 - dw, i));
+        for (let j = 0; j < dw; j++) {
+          const [X, Z] = cellOf(side, i + j);
+          put(X, 1, Z, door);
+          put(X, 2, Z, door);
+          doorCols.push({ side, ii: i + j });
+        }
+        const [cx, cz] = cellOf(side, i);
+        outDoors.push({ x: cx, z: cz, side });
+      });
+
+      // Fenster
+      const wdRaw = p.windows;
+      const wd = (wdRaw === false || wdRaw === 'none' || (wdRaw && wdRaw.enabled === false)) ? null
+        : Object.assign({ width: 1, gap: 2 }, (wdRaw && typeof wdRaw === 'object') ? wdRaw : {});
+      if (wd && Array.isArray(wd.placements) && wd.placements.length) {
+        // Präzise Positionen aus der Bildanalyse statt symmetrischer Standardfenster.
+        wd.placements.slice(0, 48).forEach((q) => {
+          if (!q || !DIRS[q.side]) return;
+          const side = q.side;
+          const L = lenOf(side);
+          const ww = num(q.width, 1, 1, Math.min(4, L - 2));
+          const wh = num(q.height, 2, 1, Math.max(1, h - 1));
+          const i = Math.max(1, Math.min(L - 1 - ww, Math.round(1 + frac(q.pos, 0.5) * (L - 2 - ww))));
+          const floor = num(q.floor, 1, 1, n);
+          const y0 = (floor - 1) * (h + 1) + 2;
+          for (let t = 0; t < ww; t++) {
+            if (floor === 1 && doorCols.some(c => c.side === side && c.ii === i + t)) continue;
+            const [X, Z] = cellOf(side, i + t);
+            for (let r = 0; r < wh && y0 + r <= floor * (h + 1) - 1; r++) put(X, y0 + r, Z, win);
+          }
+        });
+      } else if (wd) {
+        const sides = Array.isArray(wd.sides) && wd.sides.length ? wd.sides.filter((s) => DIRS[s]) : ['north', 'south', 'west', 'east'];
+        const ww = num(wd.width, 1, 1, 3);
+        const gap = num(wd.gap, 2, 1, 5);
+        const wh = num(wd.height, h >= 4 ? 2 : 1, 1, Math.max(1, h - 1));
+        sides.forEach((side) => {
+          const L = lenOf(side);
+          const cnt = Math.floor((L - 2 + gap) / (ww + gap));
+          if (cnt <= 0) return;
+          const total = cnt * ww + (cnt - 1) * gap;
+          const start = 1 + Math.floor((L - 2 - total) / 2);
+          for (let j = 0; j < cnt; j++) {
+            const a = start + j * (ww + gap);
+            const hitsDoor = doorCols.some((c) => c.side === side && c.ii >= a && c.ii <= a + ww - 1);
+            for (let k = 0; k < n; k++) {
+              if (k === 0 && hitsDoor) continue;
+              for (let t = 0; t < ww; t++) {
+                const [X, Z] = cellOf(side, a + t);
+                for (let r = 0; r < wh; r++) put(X, k * (h + 1) + 2 + r, Z, win);
+              }
+            }
+          }
+        });
+      }
+
+      // Dach
+      const r = (p.roof && typeof p.roof === 'object') ? p.roof : { type: p.roof };
+      const rtype = ['gable', 'hip', 'pyramid', 'shed', 'flat', 'none'].includes(r.type) ? r.type : 'gable';
+      const rs = roofSet(r.material || m.roof);
+      const oo = num(r.overhang, 1, 0, 2);
+      const stair = (dir) => rs.stairs + '[facing=' + dir + ']';
+
+      if (rtype === 'gable' || rtype === 'shed') {
+        const ax = r.ridge_axis === 'z' ? 'z' : r.ridge_axis === 'x' ? 'x' : (w >= d ? 'x' : 'z');
+        const u0 = ax === 'x' ? x0 : z0;
+        const ulen = ax === 'x' ? w : d;
+        const v0 = ax === 'x' ? z0 : x0;
+        const vlen = ax === 'x' ? d : w;
+        const at = (u, v, y, id) => (ax === 'x' ? put(u, y, v, id) : put(v, y, u, id));
+        const vNeg = ax === 'x' ? 'north' : 'west';
+        const vPos = ax === 'x' ? 'south' : 'east';
+        const go = Math.min(oo, 1);
+        if (rtype === 'gable') {
+          for (let k = 0; ; k++) {
+            const va = v0 - oo + k;
+            const vb = v0 + vlen - 1 + oo - k;
+            if (va > vb) break;
+            const y = yc + 1 + k;
+            for (let u = u0 - go; u <= u0 + ulen - 1 + go; u++) {
+              if (va === vb) at(u, va, y, rs.slab);
+              else { at(u, va, y, stair(vPos)); at(u, vb, y, stair(vNeg)); }
+              // Wand unter dem ersten Dachstein in der Wandebene schließen
+              if (u >= u0 && u <= u0 + ulen - 1) {
+                if (va === v0 && va !== vb) for (let yy = yc + 1; yy < y; yy++) at(u, va, yy, wall);
+                if (vb === v0 + vlen - 1 && va !== vb) for (let yy = yc + 1; yy < y; yy++) at(u, vb, yy, wall);
+              }
+            }
+            // Giebelwand an beiden Enden
+            [u0, u0 + ulen - 1].forEach((u) => {
+              for (let v = Math.max(v0, va + 1); v <= Math.min(v0 + vlen - 1, vb - 1); v++) at(u, v, y, wall);
+            });
+          }
+          // Giebelfenster
+          if (vlen >= 5) {
+            const vc = v0 + Math.floor((vlen - 1) / 2);
+            [u0, u0 + ulen - 1].forEach((u) => at(u, vc, yc + 2, win));
+          }
+        } else {
+          // Pultdach: r.high_side = Seite, an der das Dach am höchsten ist (Standard: Norden)
+          const hi = DIRS[r.high_side] ? r.high_side : 'north';
+          const acrossZ = hi === 'north' || hi === 'south';
+          const U0 = acrossZ ? x0 : z0;
+          const UL = acrossZ ? w : d;
+          const V0 = acrossZ ? z0 : x0;
+          const VL = acrossZ ? d : w;
+          const highPos = hi === 'south' || hi === 'east';
+          for (let k = 0; k < VL + 2 * oo; k++) {
+            const v = highPos ? V0 - oo + k : V0 + VL - 1 + oo - k;
+            const y = yc + 1 + k;
+            for (let u = U0 - go; u <= U0 + UL - 1 + go; u++) {
+              if (acrossZ) put(u, y, v, stair(hi)); else put(v, y, u, stair(hi));
+              if (u >= U0 && u <= U0 + UL - 1 && v >= V0 && v <= V0 + VL - 1) {
+                for (let yy = yc + 1; yy < y; yy++) {
+                  if (acrossZ) put(u, yy, v, wall); else put(v, yy, u, wall);
+                }
+              }
+            }
+          }
+        }
+      } else if (rtype === 'hip' || rtype === 'pyramid') {
+        for (let k = 0; ; k++) {
+          const xl = x0 - oo + k;
+          const xr = x1 + oo - k;
+          const zn = z0 - oo + k;
+          const zs = z1 + oo - k;
+          if (xl > xr || zn > zs) break;
+          const y = yc + 1 + k;
+          if (xl === xr || zn === zs) {
+            for (let x = xl; x <= xr; x++) for (let z = zn; z <= zs; z++) put(x, y, z, rs.slab);
+            break;
+          }
+          for (let x = xl; x <= xr; x++) for (let z = zn; z <= zs; z++) {
+            const ex = x === xl || x === xr;
+            const ez = z === zn || z === zs;
+            if (!ex && !ez) continue;
+            if (ex && ez) put(x, y, z, rs.block);
+            else put(x, y, z, stair(z === zn ? 'south' : z === zs ? 'north' : x === xl ? 'east' : 'west'));
+            if (k === oo) for (let yy = yc + 1; yy < y; yy++) put(x, yy, z, wall);
+          }
+        }
+      } else if (rtype === 'flat') {
+        for (let x = x0 - oo; x <= x1 + oo; x++) for (let z = z0 - oo; z <= z1 + oo; z++) {
+          const edge = x === x0 - oo || x === x1 + oo || z === z0 - oo || z === z1 + oo;
+          put(x, yc + 1, z, edge ? rs.block : rs.slab);
+        }
+      }
+
+      // Schornstein
+      if (p.chimney && typeof p.chimney === 'object') {
+        const cx = x0 + num(p.chimney.x, w - 3, 1, w - 2);
+        const cz = z0 + num(p.chimney.z, 1, 1, d - 2);
+        const cid = idOf(p.chimney.material, 'bricks');
+        let top = yc;
+        for (let y = yc; y <= lim.h + 14; y++) if (has(cx, y, cz)) top = y;
+        for (let y = yc + 1; y <= top + 1; y++) put(cx, y, cz, cid);
+      }
+    });
+
+    // Bäume
+    const trees = Array.isArray(spec.trees) ? spec.trees.slice(0, 8) : [];
+    trees.forEach((t) => {
+      if (!t || typeof t !== 'object') return;
+      const x = num(t.x, 0, -20, 70);
+      const z = num(t.z, 0, -20, 70);
+      const kind = t.type === 'birch' ? 'birch' : t.type === 'spruce' ? 'spruce' : 'oak';
+      const th = 4 + (Math.abs(x * 7 + z * 3) % 2);
+      for (let y = 0; y <= th; y++) if (has(x, y, z)) return;
+      for (let y = 1; y <= th; y++) put(x, y, z, kind + '_log');
+      const leaf = (xx, yy, zz) => { if (!has(xx, yy, zz)) put(xx, yy, zz, kind + '_leaves'); };
+      for (let y = th - 1; y <= th; y++) for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) {
+        if (Math.abs(dx) === 2 && Math.abs(dz) === 2) continue;
+        leaf(x + dx, y, z + dz);
+      }
+      for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+        if (Math.abs(dx) === 1 && Math.abs(dz) === 1) continue;
+        leaf(x + dx, th + 1, z + dz);
+      }
+      leaf(x, th + 2, z);
+    });
+
+    if (!cells.size) throw new Error('Der Hausplan war leer.');
+
+    // Grenzen
+    let minX = 1e9, maxX = -1e9, minZ = 1e9, maxZ = -1e9, maxY = 0;
+    for (const k of cells.keys()) {
+      const [x, y, z] = k.split(',').map(Number);
+      if (x < minX) minX = x; if (x > maxX) maxX = x;
+      if (z < minZ) minZ = z; if (z > maxZ) maxZ = z;
+      if (y > maxY) maxY = y;
+    }
+    const g = spec.ground && typeof spec.ground === 'object' ? spec.ground : {};
+    const margin = num(g.margin, 2, 0, 4);
+    const groundId = idOf(g.block || mat.ground, 'grass_block');
+    const pathId = idOf(g.path || mat.path, 'dirt_path');
+    minX -= margin; maxX += margin; minZ -= margin; maxZ += margin;
+
+    if (groundId !== 'none') {
+      for (let x = minX; x <= maxX; x++) for (let z = minZ; z <= maxZ; z++) if (!has(x, 0, z)) put(x, 0, z, groundId);
+      if (g.path !== false && mat.path !== 'none') {
+        outDoors.forEach((od) => {
+          const [dx, dz] = DIRS[od.side];
+          let x = od.x + dx;
+          let z = od.z + dz;
+          while (x >= minX && x <= maxX && z >= minZ && z <= maxZ) {
+            if (cells.get(K(x, 0, z)) === groundId) put(x, 0, z, pathId);
+            x += dx; z += dz;
+          }
+        });
+      }
+    }
+
+    // Raster
+    const HW = 48, HD = 48, HH = 40;
+    const W = Math.min(maxX - minX + 1, HW);
+    const D = Math.min(maxZ - minZ + 1, HD);
+    const H = Math.min(maxY + 1, HH);
+    const symOf = new Map();
+    const palette = {};
+    const layers = [];
+    for (let y = 0; y < H; y++) {
+      const rows = [];
+      for (let z = 0; z < D; z++) {
+        let row = '';
+        for (let x = 0; x < W; x++) {
+          const id = cells.get(K(x + minX, y, z + minZ));
+          if (!id) { row += '.'; continue; }
+          if (!symOf.has(id)) {
+            const s = SYMS[Math.min(symOf.size, SYMS.length - 1)];
+            symOf.set(id, s);
+            if (!palette[s]) palette[s] = id;
+          }
+          row += symOf.get(id);
+        }
+        rows.push(row);
+      }
+      layers.push(rows);
+    }
+    while (layers.length > 1 && layers[layers.length - 1].every((r2) => /^\.*$/.test(r2))) layers.pop();
+
+    return {
+      name: String(spec.name || 'Haus').slice(0, 80),
+      notes: [spec.analysis, spec.notes].filter(Boolean).map(String).join('\n\n').slice(0, 1500),
+      palette,
+      layers,
+    };
+  }
+
+  return { generate, roofSet };
+})();
+// GEN_END
+
+const SIZE_PRESETS = {
+  S: { w: 16, d: 16, h: 14 },
+  M: { w: 24, d: 24, h: 20 },
+  L: { w: 32, d: 32, h: 26 },
+  XL: { w: 44, d: 44, h: 34 },
+};
+
+function buildPrompt(size, hint, hasImage) {
+  const s = SIZE_PRESETS[size] || SIZE_PRESETS.M;
+  const intro = hasImage
+    ? 'Das angehängte Bild ist die maßgebliche Referenz. Rekonstruiere die sichtbare Fassade möglichst originalgetreu: EXAKTE relative Positionen der Fenster und Türen. Schau genau hin: Grundriss-Proportionen, Stockwerke, Dachform und Dachrichtung, Anzahl und Anordnung von Fenstern und Türen, Anbauten, Schornstein, Materialien und Farben.'
+    : 'Der Nutzer beschreibt ein Haus im Wunsch-Text unten. Entwirf danach das Haus.';
+  return `Du bist ein erfahrener Minecraft-Baumeister. ${intro}
+Beschreibe, wie man das Gebäude in Minecraft (Java Edition, Vanilla) nachbaut. Du lieferst KEINE Blockraster, sondern nur eine kompakte Bauplan-Beschreibung als JSON. Daraus erzeugt ein Programm die Ebenen.
+
+Größenrahmen (Blöcke): Gesamtbreite höchstens ${s.w - 4}, Gesamttiefe höchstens ${s.d - 4}, Gesamthöhe inkl. Dach höchstens ${s.h}. Wähle die Maße so, dass die Proportionen des Hauses stimmen (Breite zu Tiefe zu Höhe).
+
+JSON-Format (alle Felder außer parts sind optional):
+{
+ "name": "kurzer deutscher Name",
+ "analysis": "1-2 Sätze Deutsch: was du im Bild siehst",
+ "notes": "kurze deutsche Bautipps",
+ "materials": {            // Standard für alle Teile, jeweils eine echte Vanilla-Block-ID ohne minecraft:
+   "wall": "white_terracotta",   // Wandfläche
+   "corner": "dark_oak_log",     // Eckpfeiler
+   "base": "cobblestone",        // Sockel/Fundament
+   "floor": "spruce_planks",     // Fußboden und Decken
+   "band": "dark_oak_log",       // Balken auf Geschosshöhe (Standard: wie wall)
+   "roof": "dark_oak",           // NUR ein Material mit Treppen und Stufen: oak, spruce, birch, jungle, acacia, dark_oak, mangrove, cherry, stone_brick, cobblestone, brick, sandstone, red_sandstone, deepslate_tile, deepslate_brick, nether_brick, mud_brick, quartz, prismarine, blackstone, tuff_brick, cut_copper
+   "window": "glass_pane",       // glass_pane, glass oder gefärbtes Glas
+   "door": "spruce",             // Holzart der Tür
+   "ground": "grass_block", "path": "dirt_path"
+ },
+ "parts": [                // 1 bis 6 Quader; Hauptteil zuerst, dann Anbauten, Flügel, Türme
+  {
+   "x": 0, "z": 0,         // Position der Nordwest-Ecke in Blöcken (nicht negativ); x nach Osten, z nach Süden
+   "w": 11, "d": 8,        // Breite (Ost-West) und Tiefe (Nord-Süd), 4-22
+   "floors": 2,            // Stockwerke 1-4
+   "floor_height": 3,      // lichte Höhe je Stockwerk 2-6 (Standard 3)
+   "base_height": 1,       // Sockelhöhe 0-3
+   "roof": { "type": "gable", "ridge_axis": "x", "overhang": 1, "material": "dark_oak" },
+        // type: gable (Satteldach), hip (Walmdach), pyramid, shed (Pultdach, dann "high_side": "north|south|east|west"), flat, none
+        // ridge_axis: "x" = First läuft Ost-West, "z" = First läuft Nord-Süd (bei gable)
+   "doors": [ { "side": "south", "pos": 0.5, "width": 1 } ],   // side: north|south|east|west, pos 0..1 entlang der Wand (0 = West/Nord), width 1 oder 2; Haupteingang meist south
+   "windows": { "placements": [ { "side": "south", "pos": 0.2, "floor": 1, "width": 2, "height": 2 }, { "side": "south", "pos": 0.8, "floor": 1, "width": 2, "height": 2 } ] },
+        // Bevorzugt: placements = einzelne sichtbare Fenster; pos 0..1 von links nach rechts, floor beginnt bei 1.
+        // Alternative für unbekannte Rückseiten: width, gap, height, sides. false = keine Fenster.
+   "chimney": { "x": 8, "z": 2 },   // relativ zum Teil, optional
+   "materials": { }       // optionale Überschreibung einzelner Materialien nur für dieses Teil
+  }
+ ],
+ "trees": [ { "x": -3, "z": 4, "type": "oak" } ],   // optional, type: oak|birch|spruce
+ "ground": { "margin": 2 }
+}
+
+Regeln:
+- Die im Bild sichtbare Vorderseite zeigt nach Süden: dort kommt der Haupteingang hin.
+- Mehrteilige Häuser (L-Form, Anbau, Turm) als mehrere parts, die sich an den Kanten berühren oder überlappen. Spätere Teile überschreiben frühere im gemeinsamen Bereich, ein höherer Turm kommt also später.
+- Fenster und Türen werden automatisch gleichmäßig verteilt, passe nur width, gap, sides und pos an das Bild an.
+- Nutze Materialien aus dem Bild (nächste Vanilla-Farbe). Fachwerk: wall white_terracotta oder smooth_sandstone, corner und band aus dark_oak_log oder stripped_oak_log.
+${hint ? `\nWunsch des Nutzers: ${hint}\n` : ''}
+Antworte ausschließlich mit EINEM JSON-Objekt, ohne Kommentare, ohne Text davor oder danach.`;
+}
+
+const ERROR_COPY = {
+  not_granted: 'Du hast der Seite die Nutzung von Claude nicht erlaubt. Lade die Seite neu und bestätige die Anfrage.',
+  sampling_disabled: 'Claude ist für dein Konto hier nicht verfügbar.',
+  rate_limited: 'Zu viele Anfragen oder dein Nutzungslimit ist erreicht. Probier es später noch einmal.',
+  session_expired: 'Bitte melde dich bei Claude neu an und lade die Seite neu.',
+  image_rejected: 'Das Bild konnte nicht verarbeitet werden. Nimm ein anderes Bild (JPG, PNG, WebP).',
+  images_unavailable: 'In dieser Ansicht kann kein Bild an Claude geschickt werden.',
+  refused: 'Claude hat dieses Bild abgelehnt. Probier ein anderes Bild.',
+  invalid_json: 'Die Antwort war unvollständig, oft weil der Bauplan zu groß wurde. Wähle eine kleinere Größe und versuch es noch einmal.',
+  empty_completion: 'Claude hat nichts geantwortet. Versuch es noch einmal.',
+  prompt_too_large: 'Der Wunsch-Text ist zu lang.',
+  upstream_error: 'Die Verbindung zu Claude ist abgebrochen. Versuch es noch einmal.',
+};
+
+$('stopBtn').addEventListener('click', () => { if (ctl) ctl.abort(); });
+
+$('analyzeBtn').addEventListener('click', async () => {
+  if (!canText || (state.image && !canImages)) return;
+  const btn = $('analyzeBtn');
+  const size = $('sizeSel').value;
+  const hint = $('hintInput').value.trim().slice(0, 300);
+  const useImage = !!state.image;
+  if (!useImage && hint.length < 3) return;
+  btn.disabled = true;
+  $('stopBtn').hidden = false;
+  ctl = new AbortController();
+  setAnalyzeStatus('KI analysiert das Gebäude und erstellt den Bauplan …', 'warn');
+  try {
+    let image = null;
+    if (useImage) {
+      image = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(new Error('Das Bild konnte nicht gelesen werden.'));
+        reader.readAsDataURL(state.image);
+      });
+    }
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: ctl.signal,
+      body: JSON.stringify({ prompt: buildPrompt(size, hint, useImage), image, quality: $('qualSel').value })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || `Serverfehler (${response.status})`);
+    if (!data.spec) throw new Error('Der Server hat keinen Bauplan zurückgegeben.');
+    const bp = GEN.generate(data.spec, SIZE_PRESETS[size] || SIZE_PRESETS.M);
+    setBlueprint(bp);
+    setAnalyzeStatus('✓ Fertig! Blättere mit den Pfeiltasten durch die Ebenen.', 'ok');
+  } catch (err) {
+    if (err && err.name === 'AbortError') setAnalyzeStatus('Abgebrochen.', 'warn');
+    else setAnalyzeStatus('✗ ' + ((err && err.message) || 'Unbekannter Fehler'), 'err');
+    console.error(err);
+  } finally {
+    ctl = null;
+    $('stopBtn').hidden = true;
+    refreshAnalyzeBtn();
+  }
+});
+
+/* ---------- Export / Import ---------- */
+$('exportBtn').addEventListener('click', async () => {
+  if (!state.bp) return;
+  try {
+    const name = (state.bp.name || 'haus').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'haus';
+    const blob = new Blob([JSON.stringify(state.bp, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = name + '.json'; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (err) {
+    setAnalyzeStatus('Speichern fehlgeschlagen: ' + (err.message || err), 'warn');
+  }
+});
+$('importInput').addEventListener('change', async (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  try { setBlueprint(JSON.parse(await f.text())); } catch (err) { setAnalyzeStatus('✗ Datei ungültig: ' + err.message, 'err'); }
+  e.target.value = '';
+});
+
+/* ======================================================================
+ * 6. Demo-Haus
+ * ==================================================================== */
+function demoHouse() {
+  const W = 15, D = 11, H = 11;
+  const g = Array.from({ length: H }, () => Array.from({ length: D }, () => Array(W).fill(null)));
+  const set = (x, y, z, id) => { if (x >= 0 && x < W && y >= 0 && y < H && z >= 0 && z < D) g[y][z][x] = id; };
+  const X0 = 2, X1 = 12, Z0 = 1, Z1 = 9, DOOR = 7;
+
+  // Boden / Fundament
+  for (let z = 0; z < D; z++) for (let x = 0; x < W; x++) set(x, 0, z, 'grass_block');
+  for (let z = Z0; z <= Z1; z++) for (let x = X0; x <= X1; x++) {
+    const edge = x === X0 || x === X1 || z === Z0 || z === Z1;
+    set(x, 0, z, edge ? 'cobblestone' : 'oak_planks');
+  }
+  set(DOOR, 0, 10, 'dirt_path');
+
+  // Wände
+  for (let y = 1; y <= 4; y++) for (let z = Z0; z <= Z1; z++) for (let x = X0; x <= X1; x++) {
+    const onX = x === X0 || x === X1;
+    const onZ = z === Z0 || z === Z1;
+    if (!onX && !onZ) continue;
+    const corner = onX && onZ;
+    set(x, y, z, corner ? 'oak_log' : y === 1 ? 'stone_bricks' : 'oak_planks');
+  }
+  // Fenster
+  [[4, Z1], [5, Z1], [9, Z1], [10, Z1], [5, Z0], [9, Z0]].forEach(([x, z]) => { set(x, 2, z, 'glass_pane'); set(x, 3, z, 'glass_pane'); });
+  [[X0, 5], [X1, 5]].forEach(([x, z]) => { set(x, 2, z, 'glass_pane'); set(x, 3, z, 'glass_pane'); });
+  // Tür
+  set(DOOR, 1, Z1, 'oak_door');
+  set(DOOR, 2, Z1, 'oak_door');
+  set(DOOR - 1, 2, 10, 'torch');
+  set(DOOR + 1, 2, 10, 'torch');
+  // Büsche
+  set(4, 1, 10, 'oak_leaves'); set(10, 1, 10, 'oak_leaves');
+
+  // Satteldach (Firstrichtung = x)
+  for (let k = 0; k < 4; k++) {
+    const y = 5 + k;
+    for (let x = X0 - 1; x <= X1 + 1; x++) { set(x, y, Z0 + k, 'spruce_stairs'); set(x, y, Z1 - k, 'spruce_stairs'); }
+    for (let z = Z0 + k + 1; z <= Z1 - k - 1; z++) { set(X0, y, z, 'oak_planks'); set(X1, y, z, 'oak_planks'); }
+  }
+  for (let x = X0 - 1; x <= X1 + 1; x++) set(x, 9, 5, 'spruce_slab');
+  // Schornstein
+  for (let y = 5; y <= 10; y++) set(9, y, 3, 'cobblestone');
+
+  // Palette bauen
+  const symbols = 'abcdefghijklmnopqrstuvwxyz';
+  const palette = {};
+  const rev = new Map();
+  const layers = g.map((layer) => layer.map((row) => row.map((id) => {
+    if (!id) return '.';
+    if (!rev.has(id)) { const s = symbols[rev.size]; rev.set(id, s); palette[s] = id; }
+    return rev.get(id);
+  }).join('')));
+  return {
+    name: 'Demo: Fachwerk-Häuschen',
+    notes: 'Kleines Beispielhaus (ohne KI erzeugt), damit du die Ansicht und die Texturen testen kannst.',
+    palette,
+    layers,
+  };
+}
+$('demoBtn').addEventListener('click', () => setBlueprint(demoHouse()));
+
+/* ======================================================================
+ * 7. Start
+ * ==================================================================== */
+window.addEventListener('error', (e) => setAnalyzeStatus('Fehler: ' + (e.message || 'unbekannt'), 'err'));
+
+(async function init() {
+  try {
+    const store = await idbGet('textures');
+    if (store && Object.keys(store).length) {
+      await decodeStore(store);
+      setTexStatus(`✓ ${tex.count} Vanilla-Texturen aus dem Browser-Speicher geladen`, 'ok');
+      onTexturesChanged();
+    }
+  } catch (e) { /* kein Speicher verfügbar */ }
+
+  canText = true;
+  canImages = true;
+  try {
+    const response = await fetch('/api/health');
+    if (!response.ok) throw new Error('API nicht erreichbar');
+    const health = await response.json();
+    setAnalyzeStatus(health.configured
+      ? 'Bereit. Lade ein Hausbild hoch oder beschreibe dein Wunschhaus.'
+      : 'Webseite erreichbar, aber der Betreiber muss noch den Anthropic-API-Schlüssel im Hosting eintragen. Das Demo-Haus funktioniert bereits.', health.configured ? 'ok' : 'warn');
+  } catch (e) {
+    setAnalyzeStatus('Die Webseite läuft, aber der KI-Server ist noch nicht verbunden. Bitte API-Schlüssel und Server-Konfiguration prüfen. Das Demo-Haus funktioniert trotzdem.', 'warn');
+  }
+  refreshAnalyzeBtn();
+})();
+
+</script>
+
+</body></html>
